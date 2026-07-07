@@ -1,0 +1,30 @@
+NAME = client
+CXX = g++
+PATH_VREP=/opt/V-REP_PRO_EDU_V3_5_0_Linux
+PATH_COMMON=../common
+
+INCLUDE = -I$(PATH_VREP)/programming/include
+INCLUDE += -I$(PATH_VREP)/programming/remoteApi
+INCLUDE += -I/usr/include/eigen3
+INCLUDE += -I$(PATH_COMMON)
+
+SRCS += $(shell find . -name '.ccls-cache' -type d -prune -o -type f -name '*.cpp' -print | sed -e 's/ /\\ /g')
+SRCS += $(shell find $(PATH_COMMON) -name '.ccls-cache' -type d -prune -o -type f -name '*.cpp' -print | sed -e 's/ /\\ /g')
+SRCS += $(PATH_VREP)/programming/remoteApi/extApi.c
+SRCS += $(PATH_VREP)/programming/remoteApi/extApiPlatform.c
+
+HEADERS += $(shell find . -name '.ccls-cache' -type d -prune -o -type f -name '*.h' -print | sed -e 's/ /\\ /g')
+HEADERS += $(shell find $(PATH_COMMON) -name '.ccls-cache' -type d -prune -o -type f -name '*.h' -print | sed -e 's/ /\\ /g')
+
+override CXXFLAGS += -g -Wno-everything $(INCLUDE) -DNON_MATLAB_PARSING -DMAX_EXT_API_CONNECTIONS=255 -DDO_NOT_USE_SHARED_MEMORY
+
+all: $(NAME)
+
+$(NAME): $(SRCS) $(HEADERS)
+	$(CXX) $(CXXFLAGS) -O0 $(SRCS) -o "$@" -lpthread -lrt
+
+run: $(NAME)
+	./$(NAME)
+
+clean:
+	rm -f $(NAME)
